@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Title;
-use Illuminate\Http\Request;
+use Illuminate\Http\Req;
 
 class Usercontroller extends Controller {
     
@@ -14,8 +14,8 @@ class Usercontroller extends Controller {
         return view('homepage', ['users' => $users]);
     }
 
-    public function addUser(Request $request) {
-        $validatedData = $request->validate([
+    public function addUser(Request $req) {
+        $validatedData = $req->validate([
             'name' => 'required',
             'email' => 'required',
             'password' => 'required|min:6',
@@ -23,8 +23,8 @@ class Usercontroller extends Controller {
             'title_id' => 'required',
         ]);
 
-        if ($request->hasFile('avatar')) {
-            $avatar = $request->file('avatar');
+        if ($req->hasFile('avatar')) {
+            $avatar = $req->file('avatar');
             $avatarPath = $avatar->store('public/avatars');
             $validatedData['avatar'] = basename($avatarPath);
         }
@@ -57,8 +57,8 @@ class Usercontroller extends Controller {
         return view('editpage', compact('user', 'titles'));
     }
 
-    public function updateUser(Request $request, $id) {
-        $validatedData = $request->validate([
+    public function updateUser(Req $req, $id) {
+        $validatedData = $req->validate([
             'name' => 'required',
             'email' => 'required' . $id,
             'password' => 'nullable|min:6',
@@ -68,18 +68,18 @@ class Usercontroller extends Controller {
 
         $user = User::findOrFail($id);
 
-        if ($request->hasFile('avatar')) {
-            $avatar = $request->file('avatar');
+        if ($req->hasFile('avatar')) {
+            $avatar = $req->file('avatar');
             $avatarPath = $avatar->store('public/avatars');
             $validatedData['avatar'] = basename($avatarPath);
         }
 
-        if ($request->filled('password')) {
+        if ($req->filled('password')) {
             $validatedData['password'] = bcrypt($validatedData['password']);
         } else {
             unset($validatedData['password']);
         }
-        if ($request->isMethod('PUT')) {
+        if ($req->isMethod('PUT')) {
 
             $user->update($validatedData);
             return redirect()->route('home')->with('success', 'User updated successfully!');
